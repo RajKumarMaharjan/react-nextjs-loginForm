@@ -7,6 +7,7 @@ import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import GoogleSignInButton from "../ui/GoogleSignInButton"
+import { useState } from "react"
 
 
 const FormSchema = z
@@ -27,11 +28,10 @@ const FormSchema = z
     message: 'password do not match'
 })
 
-const onSubmit = (values: z.infer<typeof FormSchema>) => {
-    console.log(values)
-}
 
 const SignUpForm = () => {
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false)
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -41,6 +41,19 @@ const SignUpForm = () => {
             confirmPassword:''
         }
     })
+
+
+const onSubmit = async(values: z.infer<typeof FormSchema>) => {
+    try {
+        console.log('submitting form', values)
+        setShowSuccessAlert(true)
+
+        form.reset()
+        
+    }catch (error){
+        console.log('Error during signUp', error)
+    }
+}
 
     return (
         <Form {...form}>
@@ -103,6 +116,19 @@ const SignUpForm = () => {
                     Sign in
                 </Button>
             </form>
+            {showSuccessAlert && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4" role="alert">
+                    <strong className="font-bold">Success!</strong>
+                    <span className="block sm:inline"> You have signed up successfully.</span>
+                    <span className="absolute -top-3 bottom-0 -right-4 px-4 py-3">
+                        <svg className="fill-current h-5 w-5 text-gray-600" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" onClick={() => setShowSuccessAlert(false)}>
+                            <title>Close</title>
+                            <path fillRule="evenodd" d="M14.348 5.652a.5.5 0 00-.707 0L10 9.293 6.36 5.652a.5.5 0 10-.707.708L9.293 10l-3.64 3.64a.5.5 0 10.707.708L10 10.707l3.64 3.64a.5.5 0 00.708-.708L10.707 10l3.64-3.64a.5.5 0 000-.708z" clipRule="evenodd" />
+                        </svg>
+                    </span>
+                </div>
+               
+            )}
             <div className="flex mx-auto items-center justify-evenly before:mr-4 before:block before:h-px before:flex-grow before:bg-stone-400 after:ml-4 after:block after:h-px after:flex-grow after:bg-stone-400">
                 or
             </div>
@@ -116,6 +142,7 @@ const SignUpForm = () => {
                 </Link>
             </span>
         </Form >
+        
     )
 }
 
